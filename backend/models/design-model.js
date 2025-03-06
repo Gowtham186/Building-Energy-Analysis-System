@@ -1,15 +1,35 @@
 import { Schema, model } from "mongoose";
 
 const designSchema = new Schema({
-    dimensions : {
-        type : { height : Number, width : Number},
-        required : true
+    city:{
+        type : String,
+        required : true,
+        enum : ["Bangalore", "Mumbai", "Kolkata", "Delhi"]
     },
-    wwr : { 
-        type : Number
-    },
-    shgc : {
-        type : Number
+    facades: {
+        type: [{
+            facadeDirection: { 
+                type: String, 
+                required: true, 
+                enum: ['north', 'east', 'south', 'west'] 
+            },
+            height: { type: Number, required: true },
+            width: { type: Number, required: true },
+            wwr: { type: Number, required: true, min: 0, max: 1 },
+            shgc: { type: Number, required: true, min: 0, max: 1 },
+            duration: { type: Number, required: true, min: 0 }
+        }],
+        required: true
+    },    
+    analysis: {
+        type :[
+            {
+                facadeDirection: String,
+                Q: Number,  
+                coolingCost: Number 
+            }
+        ],
+        default : []
     }
 },{timestamps : true})
 
