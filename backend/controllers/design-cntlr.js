@@ -4,10 +4,10 @@ import Design from "../models/design-model.js"
 const designCntlr = {}
 
 designCntlr.create = async(req,res)=>{
-    const errors = validationResult(req)
-    if(!errors.isEmpty()){
-        return res.status(400).json({errors : errors.array()})
-    }
+    // const errors = validationResult(req)
+    // if(!errors.isEmpty()){
+    //     return res.status(400).json({errors : errors.array()})
+    // }
     const body = req.body
     console.log(body)
     try{
