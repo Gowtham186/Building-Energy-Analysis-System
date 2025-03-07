@@ -8,19 +8,10 @@ export const createBuildingConfig = createAsyncThunk('design/createBuildingConfi
         return response.data
     }catch(err){
         console.log(err)
-        return rejectWithValue(err.response.data)
+        return rejectWithValue(err.response.data.errors)
     }
 })
 
-export const calculateAnalysis = createAsyncThunk('design/calculateAnalysis', async({designId}, {rejectWithValue})=>{
-    try{
-        const response = await axios.post('/api/analysis/calculate', { designId })
-        console.log(response.data)
-    }catch(err){
-        console.log(err)
-        return rejectWithValue(err.response.data)
-    }
-})
 
 export const getDesign = createAsyncThunk('design/getDesign', async({id}, {rejectWithValue})=>{
     try{    
@@ -29,7 +20,29 @@ export const getDesign = createAsyncThunk('design/getDesign', async({id}, {rejec
         return response.data
     }catch(err){
         console.log(err)
-        return rejectWithValue(err.response.data)
+        return rejectWithValue(err.response.data.errors)
+    }
+})
+
+export const getAllDesigns = createAsyncThunk('design/getAllDesigns', async(_, {rejectWithValue})=>{
+    try{
+        const response = await axios.get('/api/designs')
+        console.log(response.data)
+        return response.data
+    }catch(err){
+        console.log(err)
+        return rejectWithValue(err.response.data.errors)
+    }
+})
+
+export const deleteDesign = createAsyncThunk('design/deleteDesign', async({id}, {rejectWithValue})=>{
+    try{
+        const response = await axios.delete(`/api/designs/${id}`)
+        console.log(response.data)
+        return response.data
+    }catch(err){
+        console.log(err)
+        return rejectWithValue(err.response.data.errors)
     }
 })
 
@@ -55,15 +68,7 @@ const designSlice = createSlice({
             state.loading = false
             state.serverError = action.payload
         })
-        builder.addCase(calculateAnalysis.pending, (state)=>{
-            state.loading = true
-        })
-        builder.addCase(calculateAnalysis.fulfilled, (state,action)=>{
-            state.loading = false
-        })
-        builder.addCase(calculateAnalysis.rejected, (state,action)=>{
-            state.serverError = action.payload
-        })
+        
         builder.addCase(getDesign.pending, (state)=>{
             state.loading = true
         })
@@ -75,6 +80,31 @@ const designSlice = createSlice({
             state.loading = false
             state.serverError = action.payload
         })
+        builder.addCase(getAllDesigns.pending, (state)=>{
+            state.loading = true
+        })
+        builder.addCase(getAllDesigns.fulfilled, (state,action)=>{
+            state.loading = false
+            state.allDesigns = action.payload
+            state.serverError = null
+        })
+        builder.addCase(getAllDesigns.rejected, (state,action)=>{
+            state.loading = false
+            state.serverError = action.payload
+        })
+        builder.addCase(deleteDesign.pending, (state)=>{
+            state.loading = true
+        })
+        builder.addCase(deleteDesign.fulfilled, (state,action)=>{
+            state.loading = false
+            state.allDesigns = state.allDesigns.filter((design) => design._id !== action.payload._id)
+            state.serverError = null
+        })
+        builder.addCase(deleteDesign.rejected, (state,action)=>{
+            state.loading = false
+            state.serverError = action.payload
+        })
+        
     }
 })
 export default designSlice.reducer

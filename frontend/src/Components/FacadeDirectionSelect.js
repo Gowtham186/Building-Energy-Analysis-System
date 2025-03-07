@@ -5,7 +5,7 @@ const FacadeDirectionSelect = ({ value, onChange }) => {
 
     const options = directions.map(direction => ({
         value: direction,
-        label: direction.charAt(0).toUpperCase() + direction.slice(1), // Capitalize the direction
+        label: direction.charAt(0).toUpperCase() + direction.slice(1), 
     }));
 
     return (

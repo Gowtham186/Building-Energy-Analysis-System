@@ -3,20 +3,33 @@ import { Link, useNavigate } from "react-router-dom";
 import CitySelect from "../Components/CitySelect";
 import FacadeDirectionSelect from "../Components/FacadeDirectionSelect";
 import { useDispatch, useSelector } from "react-redux";
-import { calculateAnalysis, createBuildingConfig } from "../redux/design-slice";
+import { createBuildingConfig } from "../redux/design-slice";
+import { calculateAnalysis } from "../redux/analysis-slice";
 
 export default function Home() {
     const dispatch = useDispatch();
     const navigate = useNavigate()
-    const [formData, setFormData] = useState({ city: "" });
-    const { loading, designId } = useSelector((state) => state.design);
+    const [formData, setFormData] = useState({ 
+        name:"", 
+        city: "" 
+    });
+    const { loading } = useSelector((state) => state.design);
     const [facades, setFacades] = useState([
-        { facadeDirection: "", height: 0, width: 0, wwr: 0, shgc: 0, duration: 0 }
+        { 
+            facadeDirection: "", 
+            height: 0, 
+            width: 0, 
+            wwr: 0, 
+            shgc: 0, 
+            duration: 0 }
     ]);
     const [clientErrors, setClientErrors] = useState({});
     const errors = {};
 
     const runClientvalidations = () => {
+        if(formData.name.trim().length === 0){
+            errors.name = "Name is required"
+        }
         if (formData.city.trim().length === 0) {
             errors.city = "City is required";
         }
@@ -58,6 +71,7 @@ export default function Home() {
                 const designId = response?._id
                 if(designId){
                     await dispatch(calculateAnalysis({ designId })).unwrap()
+                    console.log("Navigating to /dashboard");
                     navigate('/dashboard')
                 }else{
                     console.log("Design id is not available")
@@ -79,8 +93,18 @@ export default function Home() {
     return (
         <div className="min-h-screen bg-gray-100 p-6">
 
-            <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md">
+            <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md max-w-4xl mx-auto">
             <h1 className="text-2xl text-center font-bold mb-4">Enter Building Configuration</h1>
+            <div className="mb-4">
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700">Design Name</label>
+                <input
+                    id="name"
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                />
+            </div>
             <div className="mb-4">
                 <label className=" text-gray-700 font-semibold mb-2">Select City</label>
                 <CitySelect

@@ -5,23 +5,17 @@ import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Toolti
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 export default function CoolingCostChart({ coolingCostResults }) {
-    const conversionRate = 82; // Example: 1 USD = 82 INR, update with real-time rate if needed
-    
-    // Convert cooling costs from USD to INR
-    const coolingCostsInINR = coolingCostResults?.map((facade) => {
-        return { ...facade, coolingCost: facade.coolingCost * conversionRate };
-    });
 
     const data = {
-        labels: coolingCostsInINR?.map((facade) => facade.facadeDirection), // Facade Directions (e.g., North, South, etc.)
+        labels: coolingCostResults?.map((facade) => facade.facadeDirection), 
         datasets: [
             {
-                label: 'Cooling Cost (INR)', // Label for the bar chart
-                data: coolingCostsInINR?.map((facade) => facade.coolingCost), // Cooling cost data in INR for each facade
-                backgroundColor: 'rgba(54, 162, 235, 0.2)', // Bar background color (light blue)
-                borderColor: 'rgba(54, 162, 235, 1)', // Border color for each bar (blue)
+                label: 'Cooling Cost (INR)',
+                data: coolingCostResults?.map((facade) => facade.coolingCost), 
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
                 borderWidth: 1,
-                barThickness: 50, // Adjust thickness of bars if needed
+                barThickness: 50, 
             },
         ],
     };
@@ -31,25 +25,23 @@ export default function CoolingCostChart({ coolingCostResults }) {
         plugins: {
             title: {
                 display: true,
-                text: 'Facade Cooling Cost Estimation', // Title of the chart
+                text: 'Facade Cooling Cost Estimation', 
             },
             tooltip: {
-                enabled: true, // Enable tooltips on hover
+                enabled: true,
             },
         },
     };
 
     return (
         <div className="flex">
-            {/* Left side: Chart */}
             <div className="w-2/3 p-4">
                 <Bar data={data} options={options} />
             </div>
 
-            {/* Right side: Facade Details */}
             <div className="w-1/3 p-4">
                 <h2 className="text-xl font-semibold mb-4">Facade Cooling Cost Details</h2>
-                {coolingCostsInINR?.map((facade, index) => (
+                {coolingCostResults?.map((facade, index) => (
                     <div key={index} className="mb-4">
                         <h3 className="font-bold">{facade.facadeDirection} Facade</h3>
                         <ul>

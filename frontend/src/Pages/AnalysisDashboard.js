@@ -3,9 +3,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { getDesign } from "../redux/design-slice";
 import FacadeHeatGainChart from "../Components/FacadeHeatGainChart";
 import CoolingCostChart from "../Components/CoolingCostChart";
+import { useNavigate } from "react-router-dom";
 
 export default function AnalysisDashboard() {
     const dispatch = useDispatch();
+    const navigate = useNavigate()
     const { designId, loading, designData, serverError } = useSelector((state) => state.design);
 
     useEffect(() => {
@@ -30,7 +32,18 @@ export default function AnalysisDashboard() {
 
     return (
         <div className="container mx-auto p-6">
-            <h2 className="text-3xl font-bold text-gray-800 mb-6">Design Analysis Dashboard</h2>
+            <div className="flex justify-between items-center mb-6">
+                <div>
+                    <h2 className="text-3xl font-bold text-gray-800">Design Analysis Dashboard</h2>
+                </div>
+                <div>
+                    <button className="bg-blue-900 text-white py-2 px-4 rounded-lg hover:bg-blue-950"
+                        onClick={()=>navigate('/all-designs')}
+                    >
+                    All Designs
+                    </button>
+                </div>
+                </div>
             <p className="text-xl text-gray-700 mb-4"><strong>City:</strong> {designData?.city}</p>
 
             {designData?.facades && designData.facades.length > 0 ? (

@@ -1,5 +1,11 @@
 
 const designValidation = {
+    name:{
+        in:['body'],
+        trim : true,
+        exists : { errorMessage : 'name is required'},
+        notEmpty : { errorMessage : 'name should not be empty'},
+    },
     city:{
         in:['body'],
         trim : true,
