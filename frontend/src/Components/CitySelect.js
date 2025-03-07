@@ -1,13 +1,21 @@
+import Select from 'react-select'
+
 const CitySelect = ({ value, onChange }) => {
     const cities = ["Bangalore", "Mumbai", "Kolkata", "Delhi"];
 
-    return(
-        <select value={value} onChange={onChange} required>
-            <option value="" disabled>Select a city</option>
-            {cities.map((city) => (
-                <option key={city} value={city}>{city}</option>
-            ))}
-        </select>
-    )
+    const options = cities.map(city => ({
+        value: city,
+        label: city
+    }));
+
+    return (
+        <Select
+            value={options.find(option => option.value === value)} 
+            onChange={(selectedOption) => onChange(selectedOption ? selectedOption.value : '')} 
+            options={options} 
+            placeholder="Select a city"
+            isClearable
+        />
+    )       
 }
-export default CitySelect
+export default CitySelect;

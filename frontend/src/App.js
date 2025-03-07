@@ -1,6 +1,7 @@
 import './App.css';
 import { Link, Route, Routes } from 'react-router-dom';
 import Home from './Pages/Home';
+import AnalysisDashboard from './Pages/AnalysisDashboard';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
 
       <Routes>
         <Route path='/' element={<Home />}/>
+        <Route path='/dashboard' element={<AnalysisDashboard />}/>
       </Routes>
     </div>
   );

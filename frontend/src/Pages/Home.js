@@ -1,14 +1,15 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import CitySelect from "../Components/CitySelect";
 import FacadeDirectionSelect from "../Components/FacadeDirectionSelect";
 import { useDispatch, useSelector } from "react-redux";
-import { createBuildingConfig } from "../redux/design-slice";
+import { calculateAnalysis, createBuildingConfig } from "../redux/design-slice";
 
 export default function Home() {
     const dispatch = useDispatch();
+    const navigate = useNavigate()
     const [formData, setFormData] = useState({ city: "" });
-    const { loading } = useSelector((state) => state.design);
+    const { loading, designId } = useSelector((state) => state.design);
     const [facades, setFacades] = useState([
         { facadeDirection: "", height: 0, width: 0, wwr: 0, shgc: 0, duration: 0 }
     ]);
@@ -30,10 +31,10 @@ export default function Home() {
             if (ele.width <= 0) {
                 errors[`width${i}`] = "Width must be greater than 0";
             }
-            if (ele.wwr < 0 || ele.wwr > 1) {
+            if (ele.wwr <= 0 || ele.wwr > 1) {
                 errors[`wwr${i}`] = "WWR must be between 0 and 1";
             }
-            if (ele.shgc < 0 || ele.shgc > 1) {
+            if (ele.shgc <= 0 || ele.shgc > 1) {
                 errors[`shgc${i}`] = "SHGC must be between 0 and 1";
             }
             if (ele.duration <= 0) {
@@ -42,7 +43,7 @@ export default function Home() {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         runClientvalidations();
         console.log({ ...formData, facades });
@@ -51,7 +52,19 @@ export default function Home() {
             setClientErrors(errors);
         } else {
             setClientErrors({});
-            // dispatch(createBuildingConfig({ formData: { ...formData, facades } }))
+            
+            try{
+                const response = await dispatch(createBuildingConfig({ formData: { ...formData, facades } })).unwrap()
+                const designId = response?._id
+                if(designId){
+                    await dispatch(calculateAnalysis({ designId })).unwrap()
+                    navigate('/dashboard')
+                }else{
+                    console.log("Design id is not available")
+                }
+            }catch(err){
+                console.log(err)
+            }
         }
     };
 
@@ -65,27 +78,18 @@ export default function Home() {
 
     return (
         <div className="min-h-screen bg-gray-100 p-6">
-            <nav className="mb-6">
-                <Link
-                    to="/dashboard"
-                    className="text-blue-600 font-semibold hover:underline"
-                >
-                    Analysis Dashboard
-                </Link>
-            </nav>
-
-            <h1 className="text-2xl font-bold mb-4">Enter Building Configuration</h1>
 
             <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md">
-                <div className="mb-4">
-                    <label className="block text-gray-700 font-semibold mb-2">Select City</label>
-                    <CitySelect
-                        value={formData.city}
-                        onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
-                        className="w-full border p-2 rounded-md"
-                    />
-                    {clientErrors.city && <p className="text-red-500 text-xs">{clientErrors.city}</p>}
-                </div>
+            <h1 className="text-2xl text-center font-bold mb-4">Enter Building Configuration</h1>
+            <div className="mb-4">
+                <label className=" text-gray-700 font-semibold mb-2">Select City</label>
+                <CitySelect
+                    value={formData.city}
+                    onChange={(city) => setFormData(prev => ({ ...prev, city }))} // city is the selected value directly
+                    className="w-full border p-2 rounded-md"
+                />
+                {clientErrors.city && <p className="text-red-500 text-xs">{clientErrors.city}</p>}
+            </div>
 
                 {formData.city && (
                     <div className="space-y-4">
@@ -93,8 +97,8 @@ export default function Home() {
                             <div key={index} className="bg-gray-50 p-4 rounded-md shadow-sm">
                                 <label className="block text-gray-700 font-semibold mb-1">Facade Direction</label>
                                 <FacadeDirectionSelect
-                                    value={facade.facadeDirection}
-                                    onChange={(e) => updateFacade(index, "facadeDirection", e.target.value)}
+                                    value={facade.facadeDirection} 
+                                    onChange={(newValue) => updateFacade(index, "facadeDirection", newValue)} 
                                     className="w-full border p-2 rounded-md"
                                 />
                                 {clientErrors[`facadeDirection${index}`] && (
@@ -116,6 +120,7 @@ export default function Home() {
                                     </div>
 
                                     <div>
+                                        
                                         <input
                                             type="number"
                                             placeholder="Width"
@@ -167,6 +172,17 @@ export default function Home() {
                                         )}
                                     </div>
                                 </div>
+                                <button
+                                    type="button"
+                                    className="bg-red-500 text-white px-4 py-2 rounded-md font-semibold hover:bg-green-600"
+                                    onClick={() => {
+                                        // Remove the facade at the specified index
+                                        setFacades((prevFacades) => prevFacades.filter((_, i) => i !== index));
+                                    }}
+                                >
+                                    Delete
+                                </button>
+
                             </div>
                         ))}
 

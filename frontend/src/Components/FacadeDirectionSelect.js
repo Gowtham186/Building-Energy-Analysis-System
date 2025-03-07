@@ -1,13 +1,22 @@
-const FacadeDirectionSelect = ({ value, onChange }) => {
-    const directions = ['north', 'east', 'south', 'west']
+import Select from 'react-select';
 
-    return(
-        <select value={value} onChange={onChange} required>
-            <option value="" disabled>Select facade direction</option>
-            {directions.map((direction) => (
-                <option key={direction} value={direction}>{direction}</option>
-            ))}
-        </select>
-    )
-}
-export default FacadeDirectionSelect
+const FacadeDirectionSelect = ({ value, onChange }) => {
+    const directions = ['north', 'east', 'south', 'west'];
+
+    const options = directions.map(direction => ({
+        value: direction,
+        label: direction.charAt(0).toUpperCase() + direction.slice(1), // Capitalize the direction
+    }));
+
+    return (
+        <Select
+            value={options.find(option => option.value === value)} 
+            onChange={(selectedOption) => onChange(selectedOption ? selectedOption.value : '')}
+            options={options}
+            placeholder="Select a facade direction"
+            isClearable
+        />
+    );
+};
+
+export default FacadeDirectionSelect;

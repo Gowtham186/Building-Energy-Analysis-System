@@ -18,6 +18,10 @@ analysisCntlr.calculate = async(req,res)=>{
         const coolingCostResults = coolingCostCalculcation(design, heatGainResults)
         console.log("coolingCostResults", coolingCostResults)
 
+        design.analysis = coolingCostResults
+        await design.save()
+        return res.json(coolingCostResults)
+
     }catch(err){
         console.log(err)
         return res.status(500).json({errors : 'something went wrong'})
