@@ -46,6 +46,17 @@ export const deleteDesign = createAsyncThunk('design/deleteDesign', async({id}, 
     }
 })
 
+export const updateDesign = createAsyncThunk('design/updateDesign', async({id, name}, {rejectWithValue})=>{
+    try{
+        const response = await axios.put(`/api/designs/${id}`, {name})
+        console.log(response.data)
+        return response.data
+    }catch(err){
+        console.log(err)
+        return rejectWithValue(err.response.data.errors)
+    }
+})
+
 const designSlice = createSlice({
     name : 'design',
     initialState : {
@@ -101,6 +112,18 @@ const designSlice = createSlice({
             state.serverError = null
         })
         builder.addCase(deleteDesign.rejected, (state,action)=>{
+            state.loading = false
+            state.serverError = action.payload
+        })
+        builder.addCase(updateDesign.pending, (state)=>{
+            state.loading = true
+        })
+        builder.addCase(updateDesign.fulfilled, (state,action)=>{
+            state.loading = false
+            state.allDesigns = state.allDesigns.map(ele => ele._id === action.payload._id ? action.payload : ele)
+            state.serverError = null
+        })
+        builder.addCase(updateDesign.rejected, (state,action)=>{
             state.loading = false
             state.serverError = action.payload
         })

@@ -60,6 +60,7 @@ designCntlr.update = async(req,res)=>{
     }
     const id = req.params.id
     const body = req.body
+    console.log(body)
     try{
         const design = await Design.findByIdAndUpdate(id, body, { runValidators : true, new : true})
 
